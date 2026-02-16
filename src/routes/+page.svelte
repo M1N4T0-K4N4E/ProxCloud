@@ -12,7 +12,7 @@
     cores: 1,
     storage: 'local-lvm',
     diskSize: 5,
-    iso: 'local:iso/ubuntu-22.04.3-live-server-amd64.iso'
+    iso: 'local:iso/ubuntu-24.04.4-live-server-amd64.iso'
   };
 </script>
 
