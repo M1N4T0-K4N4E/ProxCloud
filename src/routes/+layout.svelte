@@ -2,11 +2,13 @@
 	import Header from './Header.svelte';
 	import './layout.css';
 
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <div class="app">
-	<Header />
+	{#if data?.session}
+		<Header user={data.user} />
+	{/if}
 	<main>{@render children()}</main>
 </div>
 
@@ -21,10 +23,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 1rem;
 		width: 100%;
-		max-width: 64rem;
-		margin: 0 auto;
 		box-sizing: border-box;
 	}
 </style>

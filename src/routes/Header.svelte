@@ -1,30 +1,52 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import github from '$lib/images/github.svg';
+	import { createSupabaseBrowserClient } from '$lib/supabase';
+	import { goto } from '$app/navigation';
+
+	interface Props {
+		user: any;
+	}
+
+	let { user }: Props = $props();
+
+	const supabase = createSupabaseBrowserClient();
+
+	async function signOut() {
+		await supabase.auth.signOut();
+		user = null;
+		goto('/login');
+	}
 </script>
 
 <header>
-
+	{#if user}
 	<nav>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li aria-current={page.url.pathname === '/' ? 'page' : undefined}>
-				<a href={resolve('/')}>Home</a>
+			<li aria-current={page.url.pathname === '/create-vm' ? 'page' : undefined}>
+				<a href={resolve('/create-vm')}>Create VM</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
 			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
 		</svg>
 	</nav>
+
+	<div class="user-section">
+		<span class="user-email">{user.email}</span>
+		<button class="sign-out-btn" onclick={signOut}>Sign Out</button>
+	</div>
+	{/if}
 </header>
 
 <style>
 	header {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 	}
 
 	nav {
@@ -89,5 +111,35 @@
 
 	a:hover {
 		color: var(--color-theme-1);
+	}
+
+	.user-section {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding-right: 1rem;
+	}
+
+	.user-email {
+		font-size: 0.8rem;
+		color: var(--color-text);
+		opacity: 0.7;
+	}
+
+	.sign-out-btn {
+		padding: 0.35rem 0.75rem;
+		background: transparent;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--color-text);
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.sign-out-btn:hover {
+		background: rgba(0, 0, 0, 0.05);
+		border-color: rgba(0, 0, 0, 0.3);
 	}
 </style>
