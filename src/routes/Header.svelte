@@ -21,24 +21,27 @@
 
 <header>
 	{#if user}
-	<nav>
-		<svg viewBox="0 0 2 3" aria-hidden="true">
-			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
-		</svg>
-		<ul>
-			<li aria-current={page.url.pathname === '/create-vm' ? 'page' : undefined}>
-				<a href={resolve('/create-vm')}>Create VM</a>
-			</li>
-		</ul>
-		<svg viewBox="0 0 2 3" aria-hidden="true">
-			<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
-		</svg>
-	</nav>
+		<nav>
+			<svg viewBox="0 0 2 3" aria-hidden="true">
+				<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
+			</svg>
+			<ul>
+				<li aria-current={page.url.pathname === '/dashboard' ? 'page' : undefined}>
+					<a href={resolve('/dashboard')}>Dashboard</a>
+				</li>
+				<li aria-current={page.url.pathname.startsWith('/create-vm') ? 'page' : undefined}>
+					<a href={resolve('/create-vm')}>Create VM</a>
+				</li>
+			</ul>
+			<svg viewBox="0 0 2 3" aria-hidden="true">
+				<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
+			</svg>
+		</nav>
 
-	<div class="user-section">
-		<span class="user-email">{user.email}</span>
-		<button class="sign-out-btn" onclick={signOut}>Sign Out</button>
-	</div>
+		<div class="user-section">
+			<span class="user-email">{user.email}</span>
+			<button class="sign-out-btn" onclick={signOut}>Sign Out</button>
+		</div>
 	{/if}
 </header>
 

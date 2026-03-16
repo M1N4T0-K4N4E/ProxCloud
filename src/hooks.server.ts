@@ -6,13 +6,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const supabase = createSupabaseServerClient(event.cookies);
 	event.locals.supabase = supabase;
 
-	// Validate the session by calling getUser (verifies JWT server-side)
+	// Validate the session server-side securely
 	const {
 		data: { user }
 	} = await supabase.auth.getUser();
 
+	const {
+		data: { session }
+	} = await supabase.auth.getSession();
+
 	event.locals.user = user;
-	event.locals.session = user ? { user } : null;
+	event.locals.session = session;
 
 	// Protect /create-vm routes — redirect to /login if not authenticated
 	if (event.url.pathname.startsWith('/create-vm') && !user) {

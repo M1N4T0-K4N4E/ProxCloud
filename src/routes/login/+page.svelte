@@ -86,12 +86,7 @@
 		{/if}
 
 		<!-- Sign In Button -->
-		<button
-			id="google-signin-btn"
-			class="google-btn"
-			onclick={signInWithGoogle}
-			disabled={loading}
-		>
+		<button id="google-signin-btn" class="google-btn" onclick={signInWithGoogle} disabled={loading}>
 			{#if loading}
 				<div class="spinner"></div>
 				<span>Redirecting...</span>
@@ -128,7 +123,12 @@
 	/* ========== Login Page Styles ========== */
 
 	.login-wrapper {
-		font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+		font-family:
+			'Inter',
+			-apple-system,
+			BlinkMacSystemFont,
+			'Segoe UI',
+			sans-serif;
 		min-height: 100vh;
 		width: 100%;
 		display: flex;
@@ -259,12 +259,7 @@
 	/* ========== Divider ========== */
 	.divider {
 		height: 1px;
-		background: linear-gradient(
-			to right,
-			transparent,
-			rgba(255, 255, 255, 0.15),
-			transparent
-		);
+		background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
 		margin: 1.5rem 0;
 	}
 
