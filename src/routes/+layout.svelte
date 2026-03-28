@@ -5,25 +5,9 @@
 	let { children, data } = $props();
 </script>
 
-<div class="app">
+<div class="flex min-h-screen flex-col">
 	{#if data?.session}
 		<Header user={data.user} />
 	{/if}
-	<main>{@render children()}</main>
+	<main class="flex w-full flex-1 flex-col box-border">{@render children()}</main>
 </div>
-
-<style>
-	.app {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
-	}
-
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		box-sizing: border-box;
-	}
-</style>

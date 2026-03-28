@@ -36,16 +36,14 @@
 	/>
 </svelte:head>
 
-<div class="login-wrapper">
-	<!-- Animated background orbs -->
-	<div class="bg-orb orb-1"></div>
-	<div class="bg-orb orb-2"></div>
-	<div class="bg-orb orb-3"></div>
+<div class="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-linear-to-br from-[#0f0c29] via-[#1a1a3e] to-[#24243e] px-4 py-10 font-[Inter]">
+	<div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 animate-pulse rounded-full bg-indigo-500/30 blur-3xl"></div>
+	<div class="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 animate-pulse rounded-full bg-fuchsia-500/25 blur-3xl"></div>
+	<div class="pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-cyan-500/20 blur-3xl"></div>
 
-	<div class="login-card">
-		<!-- Logo / Branding -->
-		<div class="brand">
-			<div class="logo-icon">
+	<div class="relative z-10 w-full max-w-md rounded-3xl border border-white/15 bg-white/10 p-8 shadow-2xl backdrop-blur-2xl">
+		<div class="mb-6 text-center">
+			<div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/40">
 				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
 						d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
@@ -64,17 +62,15 @@
 					<circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5" />
 				</svg>
 			</div>
-			<h1>ProxCloud</h1>
-			<p class="tagline">Virtual Machine Management Platform</p>
+			<h1 class="m-0 text-3xl font-extrabold tracking-tight text-white">ProxCloud</h1>
+			<p class="mt-1 text-sm text-white/60">Virtual Machine Management Platform</p>
 		</div>
 
-		<!-- Divider -->
-		<div class="divider"></div>
+		<div class="my-6 h-px bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
 
-		<!-- Error message -->
 		{#if errorMessage}
-			<div class="error-banner" role="alert">
-				<svg viewBox="0 0 20 20" fill="currentColor" class="error-icon">
+			<div class="mb-5 flex items-center gap-2 rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-3 text-sm text-rose-200" role="alert">
+				<svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 shrink-0">
 					<path
 						fill-rule="evenodd"
 						d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
@@ -85,13 +81,17 @@
 			</div>
 		{/if}
 
-		<!-- Sign In Button -->
-		<button id="google-signin-btn" class="google-btn" onclick={signInWithGoogle} disabled={loading}>
+		<button
+			id="google-signin-btn"
+			class="flex w-full items-center justify-center gap-3 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-md transition hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+			onclick={signInWithGoogle}
+			disabled={loading}
+		>
 			{#if loading}
-				<div class="spinner"></div>
+				<div class="h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600"></div>
 				<span>Redirecting...</span>
 			{:else}
-				<svg class="google-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+				<svg class="h-5 w-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 					<path
 						d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
 						fill="#4285F4"
@@ -113,262 +113,8 @@
 			{/if}
 		</button>
 
-		<p class="footer-text">
+		<p class="mt-6 text-center text-xs text-white/40">
 			Secure authentication powered by <strong>Supabase</strong>
 		</p>
 	</div>
 </div>
-
-<style>
-	/* ========== Login Page Styles ========== */
-
-	.login-wrapper {
-		font-family:
-			'Inter',
-			-apple-system,
-			BlinkMacSystemFont,
-			'Segoe UI',
-			sans-serif;
-		min-height: 100vh;
-		width: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 40%, #24243e 100%);
-		position: relative;
-		overflow: hidden;
-	}
-
-	/* ========== Animated Background Orbs ========== */
-	.bg-orb {
-		position: absolute;
-		border-radius: 50%;
-		filter: blur(80px);
-		opacity: 0.4;
-		animation: float 8s ease-in-out infinite;
-	}
-
-	.orb-1 {
-		width: 400px;
-		height: 400px;
-		background: radial-gradient(circle, #6366f1, transparent);
-		top: -100px;
-		right: -100px;
-		animation-delay: 0s;
-	}
-
-	.orb-2 {
-		width: 350px;
-		height: 350px;
-		background: radial-gradient(circle, #8b5cf6, transparent);
-		bottom: -80px;
-		left: -80px;
-		animation-delay: -3s;
-	}
-
-	.orb-3 {
-		width: 250px;
-		height: 250px;
-		background: radial-gradient(circle, #06b6d4, transparent);
-		top: 50%;
-		left: 60%;
-		animation-delay: -5s;
-	}
-
-	@keyframes float {
-		0%,
-		100% {
-			transform: translate(0, 0) scale(1);
-		}
-		33% {
-			transform: translate(30px, -30px) scale(1.05);
-		}
-		66% {
-			transform: translate(-20px, 20px) scale(0.95);
-		}
-	}
-
-	/* ========== Card ========== */
-	.login-card {
-		position: relative;
-		z-index: 1;
-		background: rgba(255, 255, 255, 0.05);
-		backdrop-filter: blur(24px);
-		-webkit-backdrop-filter: blur(24px);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 24px;
-		padding: 3rem 2.5rem;
-		width: 100%;
-		max-width: 420px;
-		box-shadow:
-			0 8px 32px rgba(0, 0, 0, 0.4),
-			inset 0 1px 0 rgba(255, 255, 255, 0.1);
-		animation: cardAppear 0.6s ease-out;
-	}
-
-	@keyframes cardAppear {
-		from {
-			opacity: 0;
-			transform: translateY(20px) scale(0.98);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0) scale(1);
-		}
-	}
-
-	/* ========== Branding ========== */
-	.brand {
-		text-align: center;
-		margin-bottom: 1.5rem;
-	}
-
-	.logo-icon {
-		width: 56px;
-		height: 56px;
-		margin: 0 auto 1rem;
-		background: linear-gradient(135deg, #6366f1, #8b5cf6);
-		border-radius: 16px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: white;
-		box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
-	}
-
-	.logo-icon svg {
-		width: 32px;
-		height: 32px;
-	}
-
-	.brand h1 {
-		font-size: 1.75rem;
-		font-weight: 800;
-		color: #ffffff;
-		margin: 0 0 0.35rem;
-		letter-spacing: -0.02em;
-	}
-
-	.tagline {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.5);
-		margin: 0;
-		font-weight: 400;
-	}
-
-	/* ========== Divider ========== */
-	.divider {
-		height: 1px;
-		background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
-		margin: 1.5rem 0;
-	}
-
-	/* ========== Error ========== */
-	.error-banner {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		background: rgba(239, 68, 68, 0.15);
-		border: 1px solid rgba(239, 68, 68, 0.3);
-		border-radius: 12px;
-		padding: 0.75rem 1rem;
-		margin-bottom: 1.25rem;
-		color: #fca5a5;
-		font-size: 0.85rem;
-		animation: slideIn 0.3s ease-out;
-	}
-
-	@keyframes slideIn {
-		from {
-			opacity: 0;
-			transform: translateY(-8px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	.error-icon {
-		width: 18px;
-		height: 18px;
-		flex-shrink: 0;
-	}
-
-	/* ========== Google Button ========== */
-	.google-btn {
-		width: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.75rem;
-		padding: 0.875rem 1.5rem;
-		background: rgba(255, 255, 255, 0.95);
-		border: none;
-		border-radius: 14px;
-		font-size: 0.95rem;
-		font-weight: 600;
-		font-family: 'Inter', sans-serif;
-		color: #1f2937;
-		cursor: pointer;
-		transition: all 0.25s ease;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-	}
-
-	.google-btn:hover:not(:disabled) {
-		background: #ffffff;
-		transform: translateY(-2px);
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-	}
-
-	.google-btn:active:not(:disabled) {
-		transform: translateY(0);
-	}
-
-	.google-btn:disabled {
-		opacity: 0.7;
-		cursor: not-allowed;
-	}
-
-	.google-logo {
-		width: 20px;
-		height: 20px;
-	}
-
-	/* ========== Spinner ========== */
-	.spinner {
-		width: 20px;
-		height: 20px;
-		border: 2.5px solid rgba(99, 102, 241, 0.2);
-		border-top-color: #6366f1;
-		border-radius: 50%;
-		animation: spin 0.7s linear infinite;
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	/* ========== Footer Text ========== */
-	.footer-text {
-		text-align: center;
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.3);
-		margin: 1.5rem 0 0;
-	}
-
-	.footer-text strong {
-		color: rgba(255, 255, 255, 0.5);
-		font-weight: 600;
-	}
-
-	/* ========== Responsive ========== */
-	@media (max-width: 480px) {
-		.login-card {
-			margin: 1rem;
-			padding: 2rem 1.5rem;
-		}
-	}
-</style>

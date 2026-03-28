@@ -3,6 +3,50 @@ import { env } from '$env/dynamic/private';
 
 export const prerender = false;
 
+export const load = async ({ locals, fetch }: any) => {
+	if (!locals.session) {
+		return {
+			options: {
+				iso: [],
+				template: []
+			}
+		};
+	}
+
+	try {
+		const backendUrl = env.BACKEND_URL || 'http://localhost:3000';
+		const res = await fetch(`${backendUrl}/api/vm/create-options`, {
+			headers: {
+				Authorization: `Bearer ${locals.session.access_token}`
+			}
+		});
+
+		if (!res.ok) {
+			return {
+				options: {
+					iso: [],
+					template: []
+				}
+			};
+		}
+
+		const payload = await res.json();
+		return {
+			options: payload?.options || {
+				iso: [],
+				template: []
+			}
+		};
+	} catch {
+		return {
+			options: {
+				iso: [],
+				template: []
+			}
+		};
+	}
+};
+
 export const actions = {
 	create: async ({ request, locals }: any) => {
 		const data = await request.formData();
@@ -12,17 +56,26 @@ export const actions = {
 		}
 
 		// Extract form data
-		const vmid = data.get('vmid');
 		const name = data.get('name');
 		const memory = data.get('memory');
 		const cores = data.get('cores');
 		const storage = data.get('storage');
 		const diskSize = data.get('diskSize');
+		const sourceType = data.get('sourceType');
 		const iso = data.get('iso');
+		const templateVmid = data.get('templateVmid');
 
 		// Basic Validation
-		if (!vmid || !name || !memory || !cores) {
+		if (!name) {
 			return fail(400, { missing: true, message: 'Missing required fields' });
+		}
+
+		if (String(sourceType || 'iso') === 'iso' && !iso) {
+			return fail(400, { missing: true, message: 'Please select an ISO image' });
+		}
+
+		if (String(sourceType || 'iso') === 'template' && !templateVmid) {
+			return fail(400, { missing: true, message: 'Please select a template' });
 		}
 
 		try {
@@ -34,13 +87,14 @@ export const actions = {
 					Authorization: `Bearer ${locals.session.access_token}`
 				},
 				body: JSON.stringify({
-					vmid: Number(vmid),
 					name: String(name),
-					memory: Number(memory),
-					cores: Number(cores),
+					memory: Number(memory || 512),
+					cores: Number(cores || 1),
 					storage: String(storage || 'local-lvm'),
 					diskSize: Number(diskSize || 5),
-					iso: String(iso)
+					sourceType: String(sourceType || 'iso'),
+					iso: iso ? String(iso) : undefined,
+					templateVmid: templateVmid ? Number(templateVmid) : undefined
 				})
 			});
 
@@ -54,7 +108,7 @@ export const actions = {
 				});
 			}
 
-			return { success: true, taskId: result.taskId };
+			return { success: true, taskId: result.taskId, vmid: result.vmid };
 		} catch (err: any) {
 			console.error('Server Error:', err);
 			return fail(500, { error: true, message: err.message });

@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 
 export const load = async ({ locals }) => {
@@ -34,5 +34,44 @@ export const load = async ({ locals }) => {
 	} catch (err) {
 		console.error('Dashboard fetch error:', err);
 		return { metrics: null, vms: [] };
+	}
+};
+
+export const actions = {
+	delete: async ({ locals, request, fetch }) => {
+		if (!locals.session) {
+			return fail(401, { error: true, message: 'Unauthorized' });
+		}
+
+		const data = await request.formData();
+		const vmid = data.get('vmid');
+
+		if (!vmid) {
+			return fail(400, { error: true, message: 'Missing VM ID' });
+		}
+
+		const backendUrl = env.BACKEND_URL || 'http://localhost:3000';
+
+		try {
+			const res = await fetch(`${backendUrl}/api/vm/${vmid}`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${locals.session.access_token}`
+				}
+			});
+
+			const result = await res.json();
+
+			if (!res.ok) {
+				return fail(res.status, {
+					error: true,
+					message: result.details || result.error || 'Failed to delete VM'
+				});
+			}
+
+			return { success: true, message: result.message || `VM ${vmid} delete signal sent` };
+		} catch (err: any) {
+			return fail(500, { error: true, message: err.message || 'Internal Server Error' });
+		}
 	}
 };

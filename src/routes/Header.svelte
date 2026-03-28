@@ -19,130 +19,46 @@
 	}
 </script>
 
-<header>
+<header class="border-b border-slate-200 bg-white/70 px-4 py-3 backdrop-blur md:px-6">
 	{#if user}
-		<nav>
-			<svg viewBox="0 0 2 3" aria-hidden="true">
-				<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
-			</svg>
-			<ul>
-				<li aria-current={page.url.pathname === '/dashboard' ? 'page' : undefined}>
-					<a href={resolve('/dashboard')}>Dashboard</a>
+		<nav class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4">
+			<ul class="m-0 flex list-none items-center gap-2 p-0">
+				<li>
+					<a
+						href={resolve('/dashboard')}
+						class={`inline-flex items-center rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wider transition ${
+							page.url.pathname === '/dashboard'
+								? 'bg-orange-100 text-orange-700'
+								: 'text-slate-700 hover:bg-slate-100 hover:text-orange-700'
+						}`}
+					>
+						Dashboard
+					</a>
 				</li>
-				<li aria-current={page.url.pathname.startsWith('/create-vm') ? 'page' : undefined}>
-					<a href={resolve('/create-vm')}>Create VM</a>
+				<li>
+					<a
+						href={resolve('/create-vm')}
+						class={`inline-flex items-center rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wider transition ${
+							page.url.pathname.startsWith('/create-vm')
+								? 'bg-orange-100 text-orange-700'
+								: 'text-slate-700 hover:bg-slate-100 hover:text-orange-700'
+						}`}
+					>
+						Create VM
+					</a>
 				</li>
 			</ul>
-			<svg viewBox="0 0 2 3" aria-hidden="true">
-				<path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
-			</svg>
-		</nav>
 
-		<div class="user-section">
-			<span class="user-email">{user.email}</span>
-			<button class="sign-out-btn" onclick={signOut}>Sign Out</button>
-		</div>
+			<div class="flex items-center gap-3">
+				<span class="hidden text-xs text-slate-500 sm:inline">{user.email}</span>
+				<button
+					type="button"
+					class="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
+					onclick={signOut}
+				>
+					Sign Out
+				</button>
+			</div>
+		</nav>
 	{/if}
 </header>
-
-<style>
-	header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	nav {
-		display: flex;
-		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
-	}
-
-	svg {
-		width: 2em;
-		height: 3em;
-		display: block;
-	}
-
-	path {
-		fill: var(--background);
-	}
-
-	ul {
-		position: relative;
-		padding: 0;
-		margin: 0;
-		height: 3em;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		list-style: none;
-		background: var(--background);
-		background-size: contain;
-	}
-
-	li {
-		position: relative;
-		height: 100%;
-	}
-
-	li[aria-current='page']::before {
-		--size: 6px;
-		content: '';
-		width: 0;
-		height: 0;
-		position: absolute;
-		top: 0;
-		left: calc(50% - var(--size));
-		border: var(--size) solid transparent;
-		border-top: var(--size) solid var(--color-theme-1);
-	}
-
-	nav a {
-		display: flex;
-		height: 100%;
-		align-items: center;
-		padding: 0 0.5rem;
-		color: var(--color-text);
-		font-weight: 700;
-		font-size: 0.8rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		text-decoration: none;
-		transition: color 0.2s linear;
-	}
-
-	a:hover {
-		color: var(--color-theme-1);
-	}
-
-	.user-section {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		padding-right: 1rem;
-	}
-
-	.user-email {
-		font-size: 0.8rem;
-		color: var(--color-text);
-		opacity: 0.7;
-	}
-
-	.sign-out-btn {
-		padding: 0.35rem 0.75rem;
-		background: transparent;
-		border: 1px solid rgba(0, 0, 0, 0.2);
-		border-radius: 6px;
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: var(--color-text);
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.sign-out-btn:hover {
-		background: rgba(0, 0, 0, 0.05);
-		border-color: rgba(0, 0, 0, 0.3);
-	}
-</style>

@@ -1,62 +1,141 @@
 <script lang="ts">
 	export let data;
-	const { vmid, config, status, error } = data;
+	export let form;
+
+	let vmid;
+	let config;
+	let status;
+	let diskSize;
+	let imageName;
+	let error;
+
+	$: ({ vmid, config, status, diskSize, imageName, error } = data);
 </script>
 
 <svelte:head>
 	<title>VM {vmid} — ProxCloud</title>
 </svelte:head>
 
-<div class="container">
-	<div class="header">
-		<h1>Virtual Machine {vmid}</h1>
-		<a href="/dashboard" class="btn">Back to Dashboard</a>
+<div class="mx-auto max-w-6xl px-4 py-8 md:px-6">
+	<div class="mb-8 flex items-center justify-between gap-4">
+		<h1 class="m-0 text-3xl font-semibold text-slate-800">Virtual Machine {vmid}</h1>
+		<a
+			href="/dashboard"
+			class="inline-flex items-center rounded-md border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+			>Back to Dashboard</a
+		>
 	</div>
 
 	{#if error}
-		<div class="alert error">{error}</div>
+		<div class="mb-4 rounded-md border border-rose-300 bg-rose-50 px-4 py-3 text-rose-800">{error}</div>
 	{:else if config && status}
-		<div class="status-banner {status.status}">
+		{#if form?.success}
+			<div class="mb-4 rounded-md border border-emerald-300 bg-emerald-50 px-4 py-3 text-emerald-800">
+				{form.message}
+			</div>
+		{/if}
+
+		{#if form?.error}
+			<div class="mb-4 rounded-md border border-rose-300 bg-rose-50 px-4 py-3 text-rose-800">
+				{form.message}
+			</div>
+		{/if}
+
+		<div
+			class={`mb-8 rounded-md border px-4 py-3 text-center text-lg font-semibold ${
+				status.status === 'running'
+					? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+					: status.status === 'stopped'
+						? 'border-rose-300 bg-rose-50 text-rose-800'
+						: 'border-slate-300 bg-slate-100 text-slate-700'
+			}`}
+		>
 			<strong>Status:</strong>
 			{status.status.toUpperCase()}
 		</div>
 
-		<div class="actions">
-			<!-- These actions would normally trigger API endpoints to start/stop the VM -->
-			<button class="btn btn-primary" disabled={status.status === 'running'}>Start</button>
-			<button class="btn btn-danger" disabled={status.status !== 'running'}>Stop</button>
-			<a href={`/vm/${vmid}/terminal`} class="btn btn-dark">Open Terminal (VNC/SSH)</a>
+		<div class="mb-10 flex flex-wrap gap-3">
+			<form method="POST" action="?/start">
+				<button
+					class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+					disabled={status.status === 'running'}
+				>
+					Start
+				</button>
+			</form>
+			<form method="POST" action="?/stop">
+				<button
+					class="rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+					disabled={status.status !== 'running'}
+				>
+					Stop
+				</button>
+			</form>
+			<form
+				method="POST"
+				action="?/delete"
+				onsubmit={(event) => {
+					if (!confirm('Delete this VM permanently? This cannot be undone.')) {
+						event.preventDefault();
+					}
+				}}
+			>
+				<button class="rounded-md border border-rose-500 bg-white px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-600 hover:text-white">
+					Delete VM
+				</button>
+			</form>
+			<a
+				href={`/vm/${vmid}/terminal`}
+				class="inline-flex items-center rounded-md bg-slate-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-900"
+				>Open Terminal (VNC/SSH)</a
+			>
 		</div>
 
-		<div class="config-grid">
-			<div class="card">
-				<h3>General Details</h3>
-				<ul>
-					<li><strong>Name:</strong> {config.name || 'N/A'}</li>
-					<li><strong>Guest OS:</strong> {config.ostype || 'N/A'}</li>
-					<li><strong>CPU Cores:</strong> {config.cores || 'N/A'}</li>
-					<li><strong>Memory:</strong> {config.memory ? config.memory + ' MB' : 'N/A'}</li>
+		<div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+			<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+				<h3 class="mb-4 border-b-2 border-slate-100 pb-2 text-lg font-semibold text-orange-600">
+					General Details
+				</h3>
+				<ul class="m-0 list-none p-0">
+					<li class="border-b border-dashed border-slate-200 py-2 text-slate-600">
+						<strong>Name:</strong> {config.name || 'N/A'}
+					</li>
+					<li class="border-b border-dashed border-slate-200 py-2 text-slate-600">
+						<strong>Guest OS:</strong> {config.ostype || 'N/A'}
+					</li>
+					<li class="border-b border-dashed border-slate-200 py-2 text-slate-600">
+						<strong>CPU Cores:</strong> {config.cores || 'N/A'}
+					</li>
+					<li class="py-2 text-slate-600">
+						<strong>Memory:</strong> {config.memory ? config.memory + ' MB' : 'N/A'}
+					</li>
 				</ul>
 			</div>
 
-			<div class="card">
-				<h3>Hardware</h3>
-				<ul>
-					<li><strong>Bootdisk:</strong> {config.bootdisk || 'N/A'}</li>
-					<li><strong>Network:</strong> {config.net0 || 'N/A'}</li>
-					<li><strong>VirtIO SCSI ID:</strong> {config.scsihw || 'N/A'}</li>
-					{#if config.scsi0}
-						<li><strong>Disk (scsi0):</strong> {config.scsi0}</li>
-					{/if}
+			<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+				<h3 class="mb-4 border-b-2 border-slate-100 pb-2 text-lg font-semibold text-orange-600">
+					Hardware
+				</h3>
+				<ul class="m-0 list-none p-0">
+					<li class="border-b border-dashed border-slate-200 py-2 text-slate-600">
+						<strong>Disk Size:</strong> {diskSize || 'N/A'}
+					</li>
+					<li class="py-2 text-slate-600"><strong>Image Name:</strong> {imageName || 'N/A'}</li>
 				</ul>
 			</div>
 
-			<div class="card">
-				<h3>Performance</h3>
-				<ul>
-					<li><strong>Current CPU:</strong> {(status.cpu * 100).toFixed(2)}%</li>
-					<li><strong>Current RAM:</strong> {((status.mem || 0) / 1024 / 1024).toFixed(0)} MB</li>
-					<li>
+			<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+				<h3 class="mb-4 border-b-2 border-slate-100 pb-2 text-lg font-semibold text-orange-600">
+					Performance
+				</h3>
+				<ul class="m-0 list-none p-0">
+					<li class="border-b border-dashed border-slate-200 py-2 text-slate-600">
+						<strong>Current CPU:</strong> {(status.cpu * 100).toFixed(2)}%
+					</li>
+					<li class="border-b border-dashed border-slate-200 py-2 text-slate-600">
+						<strong>Current RAM:</strong> {((status.mem || 0) / 1024 / 1024).toFixed(0)} MB
+					</li>
+					<li class="py-2 text-slate-600">
 						<strong>Uptime:</strong>
 						{status.uptime ? (status.uptime / 3600).toFixed(1) + ' hours' : 'N/A'}
 					</li>
@@ -67,143 +146,3 @@
 		<p>Loading...</p>
 	{/if}
 </div>
-
-<style>
-	.container {
-		max-width: 1000px;
-		margin: 0 auto;
-		padding: 2rem 0;
-	}
-	.header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 2rem;
-	}
-	h1 {
-		margin: 0;
-		color: #333;
-	}
-
-	.status-banner {
-		padding: 1rem;
-		border-radius: 6px;
-		margin-bottom: 2rem;
-		text-align: center;
-		font-size: 1.2rem;
-		border: 1px solid transparent;
-	}
-	.status-banner.running {
-		background-color: #d4edda;
-		color: #155724;
-		border-color: #c3e6cb;
-	}
-	.status-banner.stopped {
-		background-color: #f8d7da;
-		color: #721c24;
-		border-color: #f5c6cb;
-	}
-	.status-banner.unknown {
-		background-color: #e2e3e5;
-		color: #383d41;
-		border-color: #d6d8db;
-	}
-
-	.actions {
-		display: flex;
-		gap: 1rem;
-		margin-bottom: 3rem;
-	}
-
-	.btn {
-		padding: 0.8rem 1.5rem;
-		background-color: #f1f3f5;
-		color: #333;
-		text-decoration: none;
-		border-radius: 4px;
-		font-weight: bold;
-		border: 1px solid #ddd;
-		cursor: pointer;
-		font-size: 1rem;
-		transition: background 0.2s;
-	}
-	.btn:hover:not(:disabled) {
-		background-color: #e9ecef;
-	}
-	.btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.btn.btn-primary {
-		background-color: #28a745;
-		color: white;
-		border: none;
-	}
-	.btn.btn-primary:hover:not(:disabled) {
-		background-color: #218838;
-	}
-
-	.btn.btn-danger {
-		background-color: #dc3545;
-		color: white;
-		border: none;
-	}
-	.btn.btn-danger:hover:not(:disabled) {
-		background-color: #c82333;
-	}
-
-	.btn.btn-dark {
-		background-color: #343a40;
-		color: white;
-		border: none;
-	}
-	.btn.btn-dark:hover:not(:disabled) {
-		background-color: #23272b;
-	}
-
-	.config-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-		gap: 1.5rem;
-	}
-
-	.card {
-		background: white;
-		padding: 1.5rem;
-		border-radius: 8px;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-		border: 1px solid #eee;
-	}
-	.card h3 {
-		margin-top: 0;
-		margin-bottom: 1rem;
-		color: #e05d44;
-		border-bottom: 2px solid #f1f3f5;
-		padding-bottom: 0.5rem;
-	}
-	.card ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-	.card li {
-		padding: 0.5rem 0;
-		border-bottom: 1px dashed #eee;
-		color: #555;
-	}
-	.card li:last-child {
-		border-bottom: none;
-	}
-
-	.alert {
-		padding: 1rem;
-		border-radius: 4px;
-		margin-bottom: 1rem;
-	}
-	.error {
-		background-color: #f8d7da;
-		color: #721c24;
-		border: 1px solid #f5c6cb;
-	}
-</style>
