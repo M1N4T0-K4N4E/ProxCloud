@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
+
 	export let data;
 	export let form;
 
@@ -10,6 +13,14 @@
 	let error;
 
 	$: ({ vmid, config, status, diskSize, imageName, error } = data);
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			invalidateAll();
+		}, 1000);
+
+		return () => clearInterval(interval);
+	});
 </script>
 
 <svelte:head>
