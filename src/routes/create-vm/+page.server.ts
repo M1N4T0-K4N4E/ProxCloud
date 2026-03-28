@@ -6,10 +6,8 @@ export const prerender = false;
 export const load = async ({ locals, fetch }: any) => {
 	if (!locals.session) {
 		return {
-			options: {
-				iso: [],
-				template: []
-			}
+			nodes: [],
+			options: {}
 		};
 	}
 
@@ -23,26 +21,20 @@ export const load = async ({ locals, fetch }: any) => {
 
 		if (!res.ok) {
 			return {
-				options: {
-					iso: [],
-					template: []
-				}
+				nodes: [],
+				options: {}
 			};
 		}
 
 		const payload = await res.json();
 		return {
-			options: payload?.options || {
-				iso: [],
-				template: []
-			}
+			nodes: payload?.nodes || [],
+			options: payload?.options || {}
 		};
 	} catch {
 		return {
-			options: {
-				iso: [],
-				template: []
-			}
+			nodes: [],
+			options: {}
 		};
 	}
 };
@@ -56,18 +48,18 @@ export const actions = {
 		}
 
 		// Extract form data
-		const name = data.get('name');
-		const memory = data.get('memory');
-		const cores = data.get('cores');
-		const storage = data.get('storage');
-		const diskSize = data.get('diskSize');
-		const sourceType = data.get('sourceType');
-		const iso = data.get('iso');
-		const templateVmid = data.get('templateVmid');
+	const node = data.get('node');
+	const name = data.get('name');
+	const memory = data.get('memory');
+	const cores = data.get('cores');
+	const storage = data.get('storage');
+	const diskSize = data.get('diskSize');
+	const sourceType = data.get('sourceType');
+	const iso = data.get('iso');
+	const templateVmid = data.get('templateVmid');
 
-		// Basic Validation
-		if (!name) {
-			return fail(400, { missing: true, message: 'Missing required fields' });
+	// Basic Validation
+	if (!node || !name) {
 		}
 
 		if (String(sourceType || 'iso') === 'iso' && !iso) {
@@ -87,6 +79,7 @@ export const actions = {
 					Authorization: `Bearer ${locals.session.access_token}`
 				},
 				body: JSON.stringify({
+					node: String(node),
 					name: String(name),
 					memory: Number(memory || 512),
 					cores: Number(cores || 1),

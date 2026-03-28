@@ -17,7 +17,7 @@
 		<h1 class="m-0 text-3xl font-semibold text-slate-800">Dashboard</h1>
 		<a
 			href="/create-vm"
-			class="inline-flex items-center rounded-md bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-700"
+			class="inline-flex items-center rounded-md bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white! no-underline shadow-sm ring-1 ring-orange-700/30 transition hover:bg-orange-700 hover:shadow-md"
 			>+ Create VM</a
 		>
 	</div>
@@ -131,7 +131,7 @@
 			<p class="mb-6 text-slate-600">You haven't created any virtual machines yet.</p>
 			<a
 				href="/create-vm"
-				class="inline-flex items-center rounded-md border border-slate-300 bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+				class="inline-flex items-center rounded-md bg-orange-600 px-4 py-2 text-sm font-semibold text-white! no-underline shadow-sm ring-1 ring-orange-700/30 transition hover:bg-orange-700 hover:shadow-md"
 				>Create your first VM</a
 			>
 		</div>
