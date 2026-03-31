@@ -1,4 +1,4 @@
-import { fail } from '@sveltejs/kit';
+import { fail, isRedirect, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 
 export const prerender = false;
@@ -48,18 +48,19 @@ export const actions = {
 		}
 
 		// Extract form data
-	const node = data.get('node');
-	const name = data.get('name');
-	const memory = data.get('memory');
-	const cores = data.get('cores');
-	const storage = data.get('storage');
-	const diskSize = data.get('diskSize');
-	const sourceType = data.get('sourceType');
-	const iso = data.get('iso');
-	const templateVmid = data.get('templateVmid');
+		const node = data.get('node');
+		const name = data.get('name');
+		const memory = data.get('memory');
+		const cores = data.get('cores');
+		const storage = data.get('storage');
+		const diskSize = data.get('diskSize');
+		const sourceType = data.get('sourceType');
+		const iso = data.get('iso');
+		const templateVmid = data.get('templateVmid');
 
-	// Basic Validation
-	if (!node || !name) {
+		// Basic Validation
+		if (!node || !name) {
+			return fail(400, { missing: true, message: 'Missing required fields' });
 		}
 
 		if (String(sourceType || 'iso') === 'iso' && !iso) {
@@ -101,8 +102,11 @@ export const actions = {
 				});
 			}
 
-			return { success: true, taskId: result.taskId, vmid: result.vmid };
+			throw redirect(303, `/vm/${result.vmRef || result.vmid}`);
 		} catch (err: any) {
+			if (isRedirect(err)) {
+				throw err;
+			}
 			console.error('Server Error:', err);
 			return fail(500, { error: true, message: err.message });
 		}

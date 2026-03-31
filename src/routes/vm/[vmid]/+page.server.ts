@@ -24,7 +24,7 @@ export const load = async ({ locals, params }) => {
 		}
 
 		return {
-			vmid,
+			vmid: data.vmid ?? vmid,
 			config: data.config,
 			status: data.status,
 			diskSize: data.diskSize || 'N/A',

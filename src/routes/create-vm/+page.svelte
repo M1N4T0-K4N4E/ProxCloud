@@ -44,12 +44,6 @@
 	<h1 class="mb-6 text-3xl font-semibold text-slate-800">Create VM</h1>
 
 	<!-- Status Messages -->
-	{#if form?.success}
-		<div class="mb-4 rounded-md border border-emerald-300 bg-emerald-50 px-4 py-3 text-emerald-800">
-			<strong>Success!</strong> VM {form.vmid ? `#${form.vmid}` : ''} creation task started. Task ID:
-			{form.taskId}
-		</div>
-	{/if}
 
 	{#if form?.error}
 		<div class="mb-4 rounded-md border border-rose-300 bg-rose-50 px-4 py-3 text-rose-800">
