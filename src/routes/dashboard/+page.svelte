@@ -83,12 +83,12 @@
 				>
 					<div class="vm-info">
 						<h4 class="mb-1 text-xl font-semibold text-slate-900">
-							<a href={`/vm/${vm.vmid}`} class="text-inherit no-underline hover:underline"
+							<a href={`/vm/${vm.vmRef || vm.id || vm.vmid}`} class="text-inherit no-underline hover:underline"
 								>{vm.name}</a
 							>
 						</h4>
 						<span class="text-sm text-slate-500"
-							>VMID: {vm.vmid} | Memory: {vm.maxmem
+							>VMID: {vm.proxmoxVmid || vm.vmid} | Memory: {vm.maxmem
 								? (vm.maxmem / 1024 / 1024 / 1024).toFixed(1) + ' GB'
 								: 'N/A'}</span
 						>
@@ -109,12 +109,12 @@
 							method="POST"
 							action="?/delete"
 							onsubmit={(event) => {
-								if (!confirm(`Delete VM ${vm.vmid} permanently? This cannot be undone.`)) {
+								if (!confirm(`Delete VM ${vm.proxmoxVmid || vm.vmid} permanently? This cannot be undone.`)) {
 									event.preventDefault();
 								}
 							}}
 						>
-							<input type="hidden" name="vmid" value={vm.vmid} />
+							<input type="hidden" name="vmid" value={vm.vmRef || vm.id || vm.vmid} />
 							<button
 								type="submit"
 								class="rounded-md border border-rose-400 bg-white px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-600 hover:text-white"
