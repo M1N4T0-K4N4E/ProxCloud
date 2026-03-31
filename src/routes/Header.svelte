@@ -47,6 +47,20 @@
 						Create VM
 					</a>
 				</li>
+				{#if user?.role === 'admin'}
+					<li>
+						<a
+							href={resolve('/admin')}
+							class={`inline-flex items-center rounded-md px-3 py-2 text-xs font-bold uppercase tracking-wider transition ${
+								page.url.pathname.startsWith('/admin')
+									? 'bg-orange-100 text-orange-700'
+									: 'text-slate-700 hover:bg-slate-100 hover:text-orange-700'
+							}`}
+						>
+							Admin
+						</a>
+					</li>
+				{/if}
 			</ul>
 
 			<div class="flex items-center gap-3">
