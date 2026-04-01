@@ -5,6 +5,7 @@
 	let { data } = $props();
 
 	const vmid = $derived(data.vmid);
+	const proxmoxVmid = $derived(data.proxmoxVmid);
 	const vncProxy = $derived(data.vncProxy);
 	const error = $derived(data.error);
 
@@ -26,6 +27,11 @@
 				vncStatus = 'Connecting...';
 				console.log('NoVNC Init Start for VM:', vmid);
 
+				if (!proxmoxVmid) {
+					vncStatus = 'Missing Proxmox VM ID';
+					return;
+				}
+
 				// @ts-ignore
 				const module = await import('@novnc/novnc/lib/rfb.js');
 				const RFB = module.default;
@@ -37,7 +43,7 @@
 				}
 
 				const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-				const wsUrl = `${protocol}//${window.location.hostname}:3000/api/vnc/ws?vmid=${vmid}&port=${vncProxy.port}&vncticket=${encodeURIComponent(vncProxy.ticket)}`;
+				const wsUrl = `${protocol}//${window.location.hostname}:3000/api/vnc/ws?vmid=${proxmoxVmid}&port=${vncProxy.port}&vncticket=${encodeURIComponent(vncProxy.ticket)}`;
 
 				console.log('NoVNC Connecting to:', wsUrl);
 

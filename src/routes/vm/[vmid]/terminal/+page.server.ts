@@ -21,11 +21,12 @@ export const load = async ({ locals, params }) => {
 
 		return {
 			vmid,
+			proxmoxVmid: data.success ? data.proxmoxVmid : null,
 			vncProxy: data.success ? data.vncProxy : null,
 			error: data.success ? null : data.error || 'Failed to generate VNC ticket'
 		};
 	} catch (err) {
 		console.error('VNC fetch error:', err);
-		return { error: 'Internal Server Error', vmid };
+		return { error: 'Internal Server Error', vmid, proxmoxVmid: null };
 	}
 };
