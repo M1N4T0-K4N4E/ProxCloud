@@ -1,7 +1,9 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 
-export const load = async ({ locals }) => {
+export const load = async ({ locals, depends }) => {
+	depends('app:dashboard');
+
 	if (!locals.session) {
 		throw redirect(303, '/login');
 	}
@@ -45,6 +47,7 @@ export const actions = {
 
 		const data = await request.formData();
 		const vmid = data.get('vmid');
+		const proxmoxVmid = data.get('proxmoxVmid');
 
 		if (!vmid) {
 			return fail(400, { error: true, message: 'Missing VM ID' });
@@ -53,14 +56,29 @@ export const actions = {
 		const backendUrl = env.BACKEND_URL || 'http://localhost:3000';
 
 		try {
-			const res = await fetch(`${backendUrl}/api/vm/${vmid}`, {
+			let res = await fetch(`${backendUrl}/api/vm/${vmid}`, {
 				method: 'DELETE',
 				headers: {
 					Authorization: `Bearer ${locals.session.access_token}`
 				}
 			});
 
-			const result = await res.json();
+			let result = await res.json();
+
+			// Compatibility fallback for older rows where UI ref and backend lookup key differ.
+			if (
+				res.status === 403 &&
+				proxmoxVmid &&
+				String(proxmoxVmid) !== String(vmid)
+			) {
+				res = await fetch(`${backendUrl}/api/vm/${proxmoxVmid}`, {
+					method: 'DELETE',
+					headers: {
+						Authorization: `Bearer ${locals.session.access_token}`
+					}
+				});
+				result = await res.json();
+			}
 
 			if (!res.ok) {
 				return fail(res.status, {
