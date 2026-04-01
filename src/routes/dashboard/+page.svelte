@@ -1,11 +1,51 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { invalidate } from '$app/navigation';
+
 	export let data;
 	export let form;
 
 	let metrics;
 	let vms;
+	let showDeleteModal = false;
+	let pendingDeleteVmRef: string | null = null;
+	let pendingDeleteProxmoxVmid: string | null = null;
+	let pendingDeleteLabel = '';
+	let deleteFormEl: HTMLFormElement | null = null;
 
 	$: ({ metrics, vms } = data);
+	$: hasRunningVm = Array.isArray(vms) && vms.some((vm: any) => vm?.status === 'running');
+
+	function openDeleteModal(vm: any) {
+		pendingDeleteVmRef = String(vm.vmRef || vm.id || vm.vmid || '');
+		pendingDeleteProxmoxVmid = String(vm.proxmoxVmid || vm.vmid || vm.vmRef || '');
+		pendingDeleteLabel = String(vm.name || vm.proxmoxVmid || vm.vmid || pendingDeleteVmRef || 'Unknown');
+		showDeleteModal = true;
+	}
+
+	function submitDelete() {
+		showDeleteModal = false;
+		deleteFormEl?.requestSubmit();
+	}
+
+	onMount(() => {
+		let stopPolling = false;
+
+		const poll = async () => {
+			while (!stopPolling) {
+				if (hasRunningVm) {
+					await invalidate('app:dashboard');
+				}
+				await new Promise((resolve) => window.setTimeout(resolve, 3000));
+			}
+		};
+
+		void poll();
+
+		return () => {
+			stopPolling = true;
+		};
+	});
 </script>
 
 <svelte:head>
@@ -33,6 +73,12 @@
 			{form.message}
 		</div>
 	{/if}
+
+	<form method="POST" action="?/delete" bind:this={deleteFormEl}>
+		<input type="hidden" name="vmid" value={pendingDeleteVmRef || ''} />
+		<input type="hidden" name="proxmoxVmid" value={pendingDeleteProxmoxVmid || ''} />
+		<button type="submit" class="hidden" aria-hidden="true" tabindex="-1">Delete VM</button>
+	</form>
 
 	{#if metrics}
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -105,23 +151,13 @@
 						>
 							{vm.status}
 						</div>
-						<form
-							method="POST"
-							action="?/delete"
-							onsubmit={(event) => {
-								if (!confirm(`Delete VM ${vm.proxmoxVmid || vm.vmid} permanently? This cannot be undone.`)) {
-									event.preventDefault();
-								}
-							}}
+						<button
+							type="button"
+							onclick={() => openDeleteModal(vm)}
+							class="rounded-md border border-rose-400 bg-white px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-600 hover:text-white"
 						>
-							<input type="hidden" name="vmid" value={vm.vmRef || vm.id || vm.vmid} />
-							<button
-								type="submit"
-								class="rounded-md border border-rose-400 bg-white px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-600 hover:text-white"
-							>
-								Delete
-							</button>
-						</form>
+							Delete
+						</button>
 					</div>
 				</div>
 			{/each}
@@ -134,6 +170,33 @@
 				class="inline-flex items-center rounded-md bg-orange-600 px-4 py-2 text-sm font-semibold text-white! no-underline shadow-sm ring-1 ring-orange-700/30 transition hover:bg-orange-700 hover:shadow-md"
 				>Create your first VM</a
 			>
+		</div>
+	{/if}
+
+	{#if showDeleteModal}
+		<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+			<div class="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
+				<h3 class="text-lg font-semibold text-slate-900">Delete This VM?</h3>
+				<p class="mt-2 text-sm text-slate-600">
+					This will stop and permanently remove <strong>{pendingDeleteLabel}</strong>. This action cannot be undone.
+				</p>
+				<div class="mt-6 flex justify-end gap-3">
+					<button
+						type="button"
+						onclick={() => (showDeleteModal = false)}
+						class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+					>
+						Cancel
+					</button>
+					<button
+						type="button"
+						onclick={submitDelete}
+						class="rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+					>
+						Delete VM
+					</button>
+				</div>
+			</div>
 		</div>
 	{/if}
 </div>
