@@ -12,7 +12,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 			.eq('id', locals.user.id)
 			.maybeSingle();
 
-		role = data?.role ?? null;
+		role = typeof data?.role === 'string' ? data.role.trim().toLowerCase() : null;
 	}
 
 	return {
