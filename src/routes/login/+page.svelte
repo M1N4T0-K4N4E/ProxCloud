@@ -1,11 +1,17 @@
 <script lang="ts">
 	import { createSupabaseBrowserClient } from '$lib/supabase';
 	import { goto } from '$app/navigation';
+	import { env as publicEnv } from '$env/dynamic/public';
 
 	let loading = $state(false);
 	let errorMessage = $state('');
 
 	const supabase = createSupabaseBrowserClient();
+
+	function getRedirectUrl() {
+		const baseUrl = publicEnv.PUBLIC_SITE_URL || window.location.origin;
+		return new URL('/auth/callback', baseUrl).toString();
+	}
 
 	async function signInWithGoogle() {
 		loading = true;
@@ -14,7 +20,7 @@
 		const { error } = await supabase.auth.signInWithOAuth({
 			provider: 'google',
 			options: {
-				redirectTo: `${window.location.origin}/auth/callback`
+				redirectTo: getRedirectUrl()
 			}
 		});
 
